@@ -1,0 +1,17 @@
+= meta-jvm
+
+This repository collects Java supported virtual machine binaries which can be included into Yocto projects.
+
+Supported JVMs:
+
+- Temurin 11 (x86-64, arm, arm64)
+- Temurin 17 (x86-64, arm, arm64)
+- Temurin 21 (x86-64, arm64)
+- Temurin 25 (x86-64, arm64)
+
+== Testing
+After building image, enter into shell: 
+
+```
+kas-container --runtime-args --privileged shell -c "runqemu qemux86-64 kvm slirp nographic" kas/jvm-main.yml:kas/machine-qemu-x86-64.yml
+```

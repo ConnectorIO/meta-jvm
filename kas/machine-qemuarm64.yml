@@ -1,0 +1,8 @@
+header:
+  version: 14
+
+machine: qemuarm64
+
+local_conf_header:
+  meta-jvm: |
+    EXTRA_IMAGE_FEATURES ?= "allow-empty-password allow-root-login empty-root-password post-install-logging tools-sdk tools-debug ptest-pkgs"

@@ -1,0 +1,71 @@
+name: Image build
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths-ignore:
+      - '**.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bitbake:
+    strategy:
+      fail-fast: true
+      matrix:
+        machine:
+          - qemux86-64
+          # - qemuarm64
+        yocto:
+          - scarthgap
+          # - walnascar
+        # java:
+        #   - temurin-11-bin
+        #   - temurin-17-bin
+        #   - temurin-21-bin
+        #   - temurin-25-bin
+        kas:
+          - 4.8.2
+
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download KAS
+        run: |
+          wget https://raw.githubusercontent.com/siemens/kas/refs/tags/${{ matrix.kas }}/kas-container
+          chmod a+x kas-container
+      - name: Build image
+        run: |
+          ./kas-container build kas/jvm-main.yml:kas/${{ matrix.yocto }}.yml:kas/machine-${{ matrix.machine }}.yml
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.machine }}-${{ matrix.yocto }}-image
+          path: |
+            build/tmp/deploy/images/${{ matrix.machine }}/core-image-jvm-${{ matrix.machine }}.rootfs.wic
+            build/tmp/deploy/images/${{ matrix.machine }}/core-image-jvm-${{ matrix.machine }}.rootfs.wic.bmap
+
+      - name: Cache BitBake directories
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/sstate-cache
+          key: ${{ matrix.machine }}-${{ matrix.yocto }}
+          restore-keys: |
+            ${{ matrix.machine }}-${{ matrix.yocto }}-

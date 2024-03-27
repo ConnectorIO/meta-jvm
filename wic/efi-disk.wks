@@ -1,0 +1,5 @@
+# short-description: Create an EFI disk image
+
+part /boot --source bootimg-efi --sourceparams="loader=grub-efi" --label boot --active --align 1024 --use-uuid
+part / --source rootfs --rootfs-dir=rootfs-main --fstype=ext4 --label root --align 1024 --use-uuid
+part swap --size 44 --label swap --fstype=swap --use-uuid

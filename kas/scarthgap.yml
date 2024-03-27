@@ -1,0 +1,9 @@
+header:
+  version: 16
+
+repos:
+  poky:
+    branch: scarthgap
+
+  meta-openembedded:
+    branch: scarthgap
